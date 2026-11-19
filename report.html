@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FindIt - Report Item</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f0f4f8}
+header{background:#173a64;color:#fff;text-align:center;padding:20px}
+form{background:#fff;margin:20px;padding:20px;border-radius:16px}
+label{display:block;margin-top:12px;font-weight:bold}
+input,select,textarea{width:100%;padding:10px;margin-top:6px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box;font-size:16px}
+button{width:100%;margin-top:20px;padding:12px;background:#1a6aab;color:#fff;border:none;border-radius:8px;font-size:18px}
+a{display:block;text-align:center;margin-bottom:20px}
+</style>
+</head>
+<body>
+<header><h1 id="heading">Report Item</h1></header>
+<form id="itemForm">
+<label>Item name</label><input id="title" required>
+<label>Category</label>
+<select id="category"><option>Bag</option><option>Phone</option><option>Wallet</option><option>ID Card</option><option>Books</option><option>Other</option></select>
+<label>Place</label><input id="location" required>
+<label>Date</label><input type="date" id="date" required>
+<label>Description</label><textarea id="description" rows="3"></textarea>
+<label>Contact (phone / email)</label><input id="contact" required>
+<button type="submit">Submit</button>
+</form>
+<a href="index.html">← Back to Home</a>
+<script>
+const type = new URLSearchParams(location.search).get("type") === "found" ? "found" : "lost";
+document.getElementById("heading").textContent = type === "found" ? "Report Found Item" : "Report Lost Item";
+document.getElementById("itemForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  const items = JSON.parse(localStorage.getItem("findit_items") || "[]");
+  items.unshift({
+    id: Date.now(),
+    type: type,
+    title: document.getElementById("title").value,
+    category: document.getElementById("category").value,
+    location: document.getElementById("location").value,
+    date: document.getElementById("date").value,
+    description: document.getElementById("description").value,
+    contact: document.getElementById("contact").value,
+    status: "open"
+  });
+  localStorage.setItem("findit_items", JSON.stringify(items));
+  location.href = "items.html";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FindIt - All Items</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f0f4f8}
+header{background:#173a64;color:#fff;text-align:center;padding:20px}
+.wrap{padding:20px}
+input,select{width:100%;padding:10px;margin-bottom:10px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box;font-size:16px}
+.card{background:#fff;padding:16px;border-radius:16px;margin-bottom:14px}
+.tag{padding:3px 10px;border-radius:10px;color:#fff;font-size:12px}
+.lost{background:#d9534f}.found{background:#2e9e5b}
+button{padding:8px 14px;background:#1a6aab;color:#fff;border:none;border-radius:8px}
+a{display:block;text-align:center;margin-top:20px}
+</style>
+</head>
+<body>
+<header><h1>All Items</h1></header>
+<div class="wrap">
+<input id="search" placeholder="Search items...">
+<select id="filter"><option value="">All</option><option value="lost">Lost</option><option value="found">Found</option></select>
+<div id="list"></div>
+<a href="index.html">← Back to Home</a>
+</div>
+<script>
+function load(){return JSON.parse(localStorage.getItem("findit_items")||"[]");}
+function esc(s){const d=document.createElement("div");d.textContent=s||"";return d.innerHTML;}
+function markReturned(id){
+  const items=load().map(i=>i.id===id?{...i,status:"returned"}:i);
+  localStorage.setItem("findit_items",JSON.stringify(items));
+  show();
+}
+function show(){
+  const q=document.getElementById("search").value.toLowerCase();
+  const t=document.getElementById("filter").value;
+  const list=document.getElementById("list");
+  const items=load().filter(i=>(!t||i.type===t)&&(i.title+" "+i.location+" "+i.category+" "+i.description).toLowerCase().includes(q));
+  list.innerHTML=items.length?"":"<p>No items found.</p>";
+  items.forEach(i=>{
+    list.innerHTML+=`<div class="card">
+      <span class="tag ${i.type}">${i.type.toUpperCase()}</span>
+      <h3>${esc(i.title)}</h3>
+      <p>${esc(i.category)} • ${esc(i.location)} • ${esc(i.date)}</p>
+      <p>${esc(i.description)}</p>
+      <p><b>Contact:</b> ${esc(i.contact)}</p>
+      ${i.status==="returned"?"<b>✅ Returned</b>":`<button onclick="markReturned(${i.id})">Mark as Returned</button>`}
+    </div>`;
+  });
+}
+document.getElementById("search").addEventListener("input",show);
+document.getElementById("filter").addEventListener("change",show);
+show();
+</script>
+</body>
+</html>
